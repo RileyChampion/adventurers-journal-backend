@@ -1,0 +1,27 @@
+name: CI Pipeline
+run-name: Adventurer's Journal API CI Pipeline
+on:
+  push:
+    branches:
+      - '*'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21.x'
+      
+      - name: Installing packages...
+        run: npm i
+
+      - name: Running linter...
+        run: npm run lint
+
+      - name: Running integration and e2e tests...
+        run: npm run test && npm run test:e2e
+      
+      - name: Checking test coverage...
+        run: npm run test:cov
