@@ -7,9 +7,11 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle("Adventurer's Journal API")
-    .setDescription("The DND Note Taking app API")
+    .setDescription('The DND note taking app API')
     .setVersion('1.0')
-    .addTag("adventure")
+    .addTag('users')
+    .addTag('campaigns')
+    .addTag('notes')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
