@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
-  JoinColumn,
 } from 'typeorm';
 @Entity()
 export class User {
@@ -36,9 +35,8 @@ export class User {
   deleted_on: Date;
 
   /* Relationships */
-  @OneToMany(() => Character, (characters) => characters.user, {
-    onDelete: 'CASCADE',
+  @OneToMany(() => Character, (character) => character.user, {
+    cascade: true,
   })
-  // @JoinColumn({ name: 'character_id' })
   characters: Character[];
 }
