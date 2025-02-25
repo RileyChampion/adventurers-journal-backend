@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  username String
+  password String
+  email String
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  character Character[]
+  campaigns Campaign[]
+}
+
+model Character {
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  name String
+  class String
+  level String
+  background String
+  race String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  campaigns CharactersInCampaigns[]
+}
+
+model Campaign {
+  id String @id @default(uuid())
+  title String
+  gameMaster User @relation(fields: [gameMasterId], references: [id])
+  gameMasterId String
+  status String // Probably can change to ENUM
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  archivedAt DateTime?
+  archivedBy String?
+  characters CharactersInCampaigns[]
+}
+
+model CharactersInCampaigns {
+  id String @id @default(uuid())
+  character Character @relation(fields: [characterId], references: [id])
+  characterId String
+  campaign Campaign @relation(fields: [campaignId], references: [id])
+  campaignId String
+  isAlive Boolean @default(true)
+  addedAt DateTime @default(now())
+  addedBy String
+  removedAt DateTime?
+  removedBy String?
+  removedReason String?
+  notes Note[]
+}
+
+model Note {
+  id String @id @default(uuid())
+  belongsTo CharactersInCampaigns @relation(fields: [characterCampaignId], references: [id])
+  characterCampaignId String
+  title String
+  link String //Links to S3 object
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
