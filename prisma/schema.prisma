@@ -22,7 +22,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
-  character Character[]
+  characters Character[]
   campaigns Campaign[]
 }
 
@@ -32,7 +32,7 @@ model Character {
   userId String
   name String
   class String
-  level String
+  level Int
   background String
   race String
   createdAt DateTime @default(now())
@@ -43,7 +43,8 @@ model Character {
 
 model Campaign {
   id String @id @default(uuid())
-  title String
+  name String
+  edition String?
   gameMaster User @relation(fields: [gameMasterId], references: [id])
   gameMasterId String
   status String // Probably can change to ENUM
@@ -75,6 +76,7 @@ model Note {
   characterCampaignId String
   title String
   link String //Links to S3 object
+  fileType String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
