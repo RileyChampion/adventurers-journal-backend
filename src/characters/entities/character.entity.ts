@@ -1,12 +1,12 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Character } from "@prisma/client";
+import { ApiProperty } from '@nestjs/swagger';
+import { Character } from '@prisma/client';
 
 export class CharacterEntity implements Character {
   @ApiProperty()
   id: string;
 
   @ApiProperty()
-  userId: string
+  userId: string;
 
   @ApiProperty()
   name: string;
@@ -32,6 +32,6 @@ export class CharacterEntity implements Character {
   @ApiProperty()
   updatedAt: Date;
 
-  @ApiProperty({required: false, nullable: true})
+  @ApiProperty({ required: false, nullable: true })
   deletedAt: Date | null;
 }

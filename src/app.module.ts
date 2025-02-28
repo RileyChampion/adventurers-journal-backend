@@ -2,10 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { getTypeOrmConfig } from './config/database.service';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({

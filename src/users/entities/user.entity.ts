@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
-
 export class UserEntity implements User {
   @ApiProperty()
   id: string;
@@ -23,6 +22,6 @@ export class UserEntity implements User {
   @ApiProperty()
   updatedAt: Date;
 
-  @ApiProperty({required: false, nullable: true})
+  @ApiProperty({ required: false, nullable: true })
   deletedAt: Date;
 }
