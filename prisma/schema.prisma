@@ -14,16 +14,27 @@ datasource db {
 }
 
 model User {
-  id String @id @default(uuid())
-  username String
-  password String
-  email String
-  isActive Boolean @default(true)
+  id String @id
+  email String @unique
+  username String @unique
+  name String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
   characters Character[]
   campaigns Campaign[]
+  profile Profile?
+}
+
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+  avatarUrl String?
+  bio String?
+  preferences Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Character {
@@ -35,6 +46,10 @@ model Character {
   level Int
   background String
   race String
+  alignment     String?
+  stats         Json?
+  abilities     Json?
+  inventory     Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -45,14 +60,24 @@ model Campaign {
   id String @id @default(uuid())
   name String
   edition String?
-  gameMaster User @relation(fields: [gameMasterId], references: [id])
+  description String?
+  setting String?
   gameMasterId String
-  status String // Probably can change to ENUM
+  gameMaster User @relation(fields: [gameMasterId], references: [id])
+  status CampaignStatus @default(PLANNING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   archivedAt DateTime?
   archivedBy String?
-  characters CharactersInCampaigns[]
+  players CharactersInCampaigns[]
+}
+
+enum CampaignStatus {
+  PLANNING
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
 }
 
 model CharactersInCampaigns {
@@ -61,7 +86,7 @@ model CharactersInCampaigns {
   characterId String
   campaign Campaign @relation(fields: [campaignId], references: [id])
   campaignId String
-  isAlive Boolean @default(true)
+  isActive Boolean @default(true)
   addedAt DateTime @default(now())
   addedBy String
   removedAt DateTime?
@@ -75,9 +100,25 @@ model Note {
   belongsTo CharactersInCampaigns @relation(fields: [characterCampaignId], references: [id])
   characterCampaignId String
   title String
-  link String //Links to S3 object
+  link String
   fileType String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
+  metaData NoteMetadata[]
+}
+
+model NoteMetadata {
+  id String @id @default(uuid())
+  noteId String
+  note Note @relation(fields: [noteId], references: [id])
+  version Int
+  lastModifiedBy String
+  lastModifiedAt DateTime
+  conflictStatus String? //ex NONE, PENDING, RESOLVED
+  conflictResolutionMethod String // MERGE, OVERRIDE, MANUAL
+  s3VersionId String?
+  s3Path String
+
+  @@unique([noteId,version])
 }
