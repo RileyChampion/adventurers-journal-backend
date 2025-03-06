@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id String @id
+  id String @id @default(uuid())
   email String @unique
   username String @unique
   name String?
@@ -28,8 +28,8 @@ model User {
 
 model Profile {
   id String @id @default(uuid())
-  userId String @unique
-  user User @relation(fields: [userId], references: [id])
+  userId String @unique 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   avatarUrl String?
   bio String?
   preferences Json?
@@ -39,7 +39,7 @@ model Profile {
 
 model Character {
   id String @id @default(uuid())
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
   name String
   class String
@@ -63,7 +63,7 @@ model Campaign {
   description String?
   setting String?
   gameMasterId String
-  gameMaster User @relation(fields: [gameMasterId], references: [id])
+  gameMaster User @relation(fields: [gameMasterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   status CampaignStatus @default(PLANNING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -82,7 +82,7 @@ enum CampaignStatus {
 
 model CharactersInCampaigns {
   id String @id @default(uuid())
-  character Character @relation(fields: [characterId], references: [id])
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   characterId String
   campaign Campaign @relation(fields: [campaignId], references: [id])
   campaignId String
@@ -97,7 +97,7 @@ model CharactersInCampaigns {
 
 model Note {
   id String @id @default(uuid())
-  belongsTo CharactersInCampaigns @relation(fields: [characterCampaignId], references: [id])
+  belongsTo CharactersInCampaigns @relation(fields: [characterCampaignId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   characterCampaignId String
   title String
   link String

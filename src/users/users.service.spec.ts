@@ -61,14 +61,14 @@ describe('UsersService', () => {
       const newCreateUserDto = {
         username: 'new-user-name',
         email: 'newemail@email.com',
-        password: 'testPassword',
+        name: undefined,
       };
 
       const mockCreatedUser = {
         id: '822a75c0-e0d7-4343-a627-c0b793b3dd03',
         username: newCreateUserDto.username,
         email: newCreateUserDto.email,
-        password: newCreateUserDto.password,
+        name: undefined,
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -174,13 +174,14 @@ describe('UsersService', () => {
       const updatedUserDto: UpdateUserDto = {
         username: 'newUserNameForUser',
         email: 'newEmailForUser',
+        name: 'NewNameHere',
       };
 
       const mockUpdateUser = {
         id: userId,
         username: updatedUserDto.username,
         email: updatedUserDto.email,
-        password: 'password1',
+        name: 'NewNameHere',
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -201,7 +202,11 @@ describe('UsersService', () => {
       expect(userUpdated).toBe(mockUpdateUser);
       expect(prismaUpdateSpy).toHaveBeenCalledTimes(1);
       expect(prismaUpdateSpy).toHaveBeenCalledWith({
-        data: { email: 'newEmailForUser', username: 'newUserNameForUser' },
+        data: {
+          email: 'newEmailForUser',
+          username: 'newUserNameForUser',
+          name: 'NewNameHere',
+        },
         where: { id: '822a75c0-e0d7-4343-a627-c0b793b3dd03' },
       });
     });

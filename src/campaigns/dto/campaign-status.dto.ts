@@ -1,0 +1,7 @@
+export enum CampaignStatus {
+  PLANNING = 'PLANNING',
+  ACTIVE = 'ACTIVE',
+  PAUSED = 'PAUSED',
+  COMPLETED = 'COMPLETED',
+  ARCHIVE = 'ARCHIVED',
+}
