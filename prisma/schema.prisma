@@ -13,34 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id String @id @default(uuid())
-  email String @unique
-  username String @unique
-  name String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-  characters Character[]
-  campaigns Campaign[]
-  profile Profile?
-}
+// model User {
+//   id String @id @default(uuid())
+//   email String @unique
+//   username String @unique
+//   name String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   deletedAt DateTime?
+// }
 
 model Profile {
-  id String @id @default(uuid())
-  userId String @unique 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  avatarUrl String?
+  id String @id
+  displayName String? @map("display_name")
+  avatarUrl String? @map("avatar_url")
   bio String?
   preferences Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  characters Character[]
+  campaigns Campaign[]
 }
 
 model Character {
   id String @id @default(uuid())
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  creator Profile @relation(fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creatorId String @map("creator_id")
   name String
   class String
   level Int
@@ -50,9 +48,9 @@ model Character {
   stats         Json?
   abilities     Json?
   inventory     Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
   campaigns CharactersInCampaigns[]
 }
 
@@ -62,13 +60,13 @@ model Campaign {
   edition String?
   description String?
   setting String?
-  gameMasterId String
-  gameMaster User @relation(fields: [gameMasterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  gameMasterId String @map("game_master_id")
+  gameMaster Profile @relation(fields: [gameMasterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   status CampaignStatus @default(PLANNING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  archivedAt DateTime?
-  archivedBy String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  archivedAt DateTime? @map("archieved_at")
+  archivedBy String? @map("archieved_by")
   players CharactersInCampaigns[]
 }
 
@@ -83,42 +81,42 @@ enum CampaignStatus {
 model CharactersInCampaigns {
   id String @id @default(uuid())
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  characterId String
+  characterId String @map("character_id")
   campaign Campaign @relation(fields: [campaignId], references: [id])
-  campaignId String
-  isActive Boolean @default(true)
-  addedAt DateTime @default(now())
-  addedBy String
-  removedAt DateTime?
-  removedBy String?
-  removedReason String?
+  campaignId String @map("campaign_id")
+  isActive Boolean @default(true) @map("is_active")
+  addedAt DateTime @default(now()) @map("added_at")
+  addedBy String @map("added_by")
+  removedAt DateTime? @map("removed_at")
+  removedBy String? @map("removed_by")
+  removedReason String? @map("removed_reason")
   notes Note[]
 }
 
 model Note {
   id String @id @default(uuid())
   belongsTo CharactersInCampaigns @relation(fields: [characterCampaignId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  characterCampaignId String
+  characterCampaignId String @map("character_campaign_id")
   title String
   link String
-  fileType String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  fileType String @map("file_type")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
   metaData NoteMetadata[]
 }
 
 model NoteMetadata {
   id String @id @default(uuid())
-  noteId String
+  noteId String @map("note_id")
   note Note @relation(fields: [noteId], references: [id])
   version Int
-  lastModifiedBy String
-  lastModifiedAt DateTime
-  conflictStatus String? //ex NONE, PENDING, RESOLVED
-  conflictResolutionMethod String // MERGE, OVERRIDE, MANUAL
-  s3VersionId String?
-  s3Path String
+  lastModifiedBy String @map("last_modified_by")
+  lastModifiedAt DateTime @map("last_modified_at")
+  conflictStatus String? @map("conflict_status") //ex NONE, PENDING, RESOLVED
+  conflictResolutionMethod String @map("conflict_resolution_method") // MERGE, OVERRIDE, MANUAL
+  s3VersionId String? @map("s3_version_id")
+  s3Path String @map("s3_path")
 
   @@unique([noteId,version])
 }
