@@ -7,18 +7,14 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProfilesService {
   constructor(private prisma: PrismaService) {}
 
-  findOne(userId: string) {
+  getProfile(userId: string) {
     return this.prisma.profile.findUniqueOrThrow({ where: { id: userId } });
   }
 
-  update(userId: string, updateProfileDto: UpdateProfileDto) {
+  updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
     return this.prisma.profile.update({
       where: { id: userId },
       data: updateProfileDto,
     });
-  }
-
-  remove(userId: string) {
-    return this.prisma.profile.delete({ where: { id: userId } });
   }
 }
