@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthMiddleware } from './common/auth/auth.middleware';
 
 @Module({
   imports: [
@@ -15,15 +15,13 @@ import { PrismaModule } from './prisma/prisma.module';
       ),
       isGlobal: true,
     }),
-    // TypeOrmModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: getTypeOrmConfig,
-    // }),
-    UsersModule,
     PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware);
+  }
+}
