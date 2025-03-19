@@ -22,7 +22,11 @@ model Profile {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   characters Character[]
-  campaigns Campaign[]
+  campaigns Campaign[] @relation("GameMasterFor")
+  archievedCampaigns Campaign[] @relation("ArchivedBy")
+  addedCharacters CharactersInCampaigns[] @relation("AddedBy")
+  removedCharacters CharactersInCampaigns[] @relation("RemovedBy")
+  notes Note[]
 }
 
 model Character {
@@ -42,6 +46,7 @@ model Character {
   updatedAt DateTime @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
   campaigns CharactersInCampaigns[]
+  notesMetadata NoteMetadata[]
 }
 
 model Campaign {
@@ -51,12 +56,13 @@ model Campaign {
   description String?
   setting String?
   gameMasterId String @map("game_master_id")
-  gameMaster Profile @relation(fields: [gameMasterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  gameMaster Profile @relation("GameMasterFor", fields: [gameMasterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   status CampaignStatus @default(PLANNING)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   archivedAt DateTime? @map("archieved_at")
-  archivedBy String? @map("archieved_by")
+  archiver Profile? @relation("ArchivedBy", fields: [archivedById], references: [id])
+  archivedById String? @map("archieved_by_id")
   players CharactersInCampaigns[]
 }
 
@@ -76,9 +82,11 @@ model CharactersInCampaigns {
   campaignId String @map("campaign_id")
   isActive Boolean @default(true) @map("is_active")
   addedAt DateTime @default(now()) @map("added_at")
-  addedBy String @map("added_by")
+  addedBy Profile @relation("AddedBy", fields: [addedById], references: [id])
+  addedById String @map("added_by_id")
+  removedBy Profile? @relation("RemovedBy",fields: [removedById],references: [id]) 
+  removedById String? @map("removed_by_id")
   removedAt DateTime? @map("removed_at")
-  removedBy String? @map("removed_by")
   removedReason String? @map("removed_reason")
   notes Note[]
 }
@@ -87,6 +95,8 @@ model Note {
   id String @id @default(uuid())
   belongsTo CharactersInCampaigns @relation(fields: [characterCampaignId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   characterCampaignId String @map("character_campaign_id")
+  ownedBy Profile? @relation(fields: [ownedById], references: [id])
+  ownedById String? @map("owned_by_id")
   title String
   link String
   fileType String @map("file_type")
@@ -99,10 +109,12 @@ model Note {
 model NoteMetadata {
   id String @id @default(uuid())
   noteId String @map("note_id")
-  note Note @relation(fields: [noteId], references: [id])
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
   version Int
-  lastModifiedBy String @map("last_modified_by")
+  lastModifiedById String @map("last_modified_by")
   lastModifiedAt DateTime @map("last_modified_at")
+  writtenBy Character? @relation(fields: [writtenById], references: [id])
+  writtenById String?
   conflictStatus String? @map("conflict_status") //ex NONE, PENDING, RESOLVED
   conflictResolutionMethod String @map("conflict_resolution_method") // MERGE, OVERRIDE, MANUAL
   s3VersionId String? @map("s3_version_id")
